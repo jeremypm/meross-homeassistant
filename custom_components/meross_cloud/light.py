@@ -161,7 +161,7 @@ class LightEntityWrapper(MerossDevice, LightEntity):
         if not self._device.get_supports_luminance(self._channel_id):
             return None
 
-        luminance = self._device.get_luminance()
+        luminance = self._device.get_luminance(channel=self._channel_id)
         if luminance is not None:
             return float(luminance) / 100 * 255
 
@@ -186,11 +186,14 @@ class LightEntityWrapper(MerossDevice, LightEntity):
             return color_util.color_RGB_to_hs(*rgb)
         else:
             return None  # Return None if RGB value is not available
-
+    @property
+    def rgb_color(self):
+        return self._device.get_rgb_color(channel=self._channel_id)
+        
     @property
     def color_temp(self):
         if self._device.get_supports_temperature(channel=self._channel_id):
-            value = self._device.get_color_temperature()
+            value = self._device.get_color_temperature(channel=self._channel_id)
             norm_value = (100 - value) / 100.0
             return self.min_mireds + (norm_value * (self.max_mireds - self.min_mireds))
         return None
