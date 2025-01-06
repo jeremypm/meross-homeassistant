@@ -57,7 +57,8 @@ class DiffuserLightEntityWrapper(MerossDevice, LightEntity):
     async def async_turn_on(self, **kwargs) -> None:
         if not self.is_on:
             await self._device.async_turn_on(channel=self._channel_id, skip_rate_limits=True)
-
+        if ATTR_RGB_COLOR in kwargs:
+            await self._device.async_set_light_color(channel=self._channel_id, rgb=kwargs[ATTR_RGB_COLOR], onoff=True, skip_rate_limits=True)
         if ATTR_HS_COLOR in kwargs:
             h, s = kwargs[ATTR_HS_COLOR]
             rgb = color_util.color_hsv_to_RGB(h, s, 100)
@@ -87,7 +88,10 @@ class DiffuserLightEntityWrapper(MerossDevice, LightEntity):
             return color_util.color_RGB_to_hs(*rgb)
         else:
             return None  # Return None if RGB value is not available
-
+    @property
+    def rgb_color(self):
+        return self._device.get_rgb_color(channel=self._channel_id)
+        
     @property
     def brightness(self):
         luminance = self._device.get_light_brightness()
